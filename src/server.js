@@ -14,6 +14,16 @@ async function main() {
   const app = createApp();
   const server = createServer(app);
 
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`\n❌ Port ${env.port} is already in use.`);
+      console.error(`   Run this to free it: lsof -ti:${env.port} | xargs kill -9\n`);
+      process.exit(1);
+    } else {
+      throw err;
+    }
+  });
+
   server.listen(env.port, () => {
     console.log(`FreelanceHub running at ${env.appUrl}`);
   });
