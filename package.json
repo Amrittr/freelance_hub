@@ -31,7 +31,6 @@
     "google-auth-library": "^10.9.0",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.9.2",
     "morgan": "^1.10.0",
     "nodemailer": "^9.0.3",
     "zod": "^3.24.1"
@@ -40,6 +39,6 @@
     "nodemon": "^3.1.9"
   },
   "engines": {
-    "node": "20.x"
+    "node": ">=20.0.0"
   }
 }

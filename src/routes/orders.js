@@ -62,7 +62,7 @@ ordersRouter.get(
     const orders = await Order.find(filter)
       .sort({ updatedAt: -1 })
       .populate("client", "name email profile")
-      .populate("freelancer", "name email profile stripeOnboardingComplete")
+      .populate("freelancer", "name email profile avatar")
       .populate("service", "title category price deliveryDays");
 
     res.json({ orders });

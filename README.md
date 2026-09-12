@@ -1,124 +1,70 @@
-# FreelanceHub
+# FreelanceHub 🚀
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-2ea44f?style=for-the-badge)](https://freelancehub-production-9df2.up.railway.app)
+Escrow-backed freelance marketplace built with **Node.js, Express, Firebase Realtime Database, and Firebase Auth**.
 
-**🌐 Visit the live site: [https://freelancehub-production-9df2.up.railway.app](https://freelancehub-production-9df2.up.railway.app)**
+Clients hire freelancers, fund milestones into a simulated escrow ledger, review work deliveries, and release payouts with built-in revisions and dispute protection.
 
-Escrow-style freelance marketplace with MongoDB Atlas, email notifications, Cashfree UPI checkout, client/freelancer dashboards, order messaging, disputes, revisions, and protected fund release.
+---
 
-## What Is Implemented
+## ✨ Features
 
-- MongoDB Atlas persistence through Mongoose models for users, services, orders, and messages.
-- Signup, login, logout, httpOnly JWT cookie sessions, and role switching.
-- Client dashboard with protected funds, active orders, review queue, and order actions.
-- Freelancer dashboard with service publishing, delivery submission, messages, disputes, and payout readiness.
-- Cashfree Hosted Checkout for sandbox or live client payments.
-- Cashfree signed webhooks for payment confirmation.
-- Cashfree Easy Split is the production payout path for bank or UPI vendor settlement.
-- SMTP email notifications for signup, login, payment, delivery, revisions, disputes, release, and messages.
-- Seed script for demo sellers and services.
+- **Authentication**: Firebase Authentication with Google Sign-In popup and email/password accounts, backed by httpOnly JWT cookies (`fh_token`).
+- **Dual Role Accounts**: Seamless switching between **Client** and **Freelancer** dashboards.
+- **Marketplace & Services**: Searchable service gigs with categories, filters, tag searching, and reviews.
+- **Escrow Order Lifecycle**:
+  - `payment_pending` ➔ `funded` (debited from simulated wallet) ➔ `submitted` ➔ `completed` (freelancer credited) / `revision_requested` / `disputed`.
+- **Append-Only Wallet Ledger**: Dynamic balance calculations (`Σ credits - Σ debits`) with platform fee deductions (12%).
+- **Order Messaging**: Real-time per-order discussion threads.
+- **Email Notifications**: Transactional emails (welcome, order updates, milestone releases) via Nodemailer with graceful fallback.
+- **Modern Bento UI**: Vanilla JS Single Page Application (SPA), dark/light mode themes, and custom canvas interactive charts.
 
-## Important Payment Note
+---
 
-This app implements marketplace payment protection: client pays the platform, the order is marked funded after Cashfree confirms payment, and the freelancer is paid through an approved marketplace settlement product after release.
+## 🛠 Tech Stack
 
-Do not market this as regulated legal escrow without legal review and the required licenses for your operating countries. If you need literal escrow, integrate a licensed escrow provider.
+| Layer | Technology |
+| :--- | :--- |
+| **Runtime & Server** | Node.js (≥ 20, ES Modules), Express 4.21 |
+| **Database** | Firebase Realtime Database (`freelancer-hub-1edff`) |
+| **Authentication** | Firebase Auth (Google Popup & Password) + JWT (`jsonwebtoken`) |
+| **Validation & Security** | Zod 3, Helmet (CSP configured for Firebase), CORS, Express Rate Limit |
+| **Frontend** | Vanilla JavaScript, Vanilla CSS, Lucide Icons (no bundler/framework build steps needed) |
+| **Deployment** | Vercel Serverless Function & CDN |
 
-## Setup
+---
 
-1. Install dependencies:
+## 🚀 Quick Start
 
+### 1. Install dependencies
 ```bash
 npm install
 ```
 
-2. Create `.env` from the example:
-
+### 2. Configure Environment
 ```bash
-copy .env.example .env
+cp .env.example .env
 ```
 
-3. Fill in `.env`:
-
-```bash
-MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@YOUR_CLUSTER.mongodb.net/freelancehub?retryWrites=true&w=majority
-JWT_SECRET=generate-a-long-random-secret
-PAYMENT_PROVIDER=cashfree
-CASHFREE_CLIENT_ID=TEST_...
-CASHFREE_CLIENT_SECRET=...
-CASHFREE_WEBHOOK_SECRET=...
-CASHFREE_ENV=sandbox
-CASHFREE_CURRENCY=INR
-SMTP_HOST=smtp.your-provider.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=your-smtp-user
-SMTP_PASS=your-smtp-password
-MAIL_FROM="FreelanceHub <no-reply@yourdomain.com>"
-APP_URL=http://localhost:3000
-CLIENT_URL=http://localhost:3000
-```
-
-Generate `JWT_SECRET`:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-4. Seed your Atlas database:
-
+### 3. (Optional) Seed Demo Data
+To seed 18 demo sellers, services, and transactions:
 ```bash
 npm run seed
 ```
+*Demo user password:* `FreelanceHub123!`
 
-5. Start locally:
-
+### 4. Run Development Server
 ```bash
 npm run dev
 ```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser!
 
-Open `http://localhost:3000`.
+---
 
-## Cashfree Webhook
+## 🌐 Deploy to Vercel
 
-Configure a Cashfree webhook in the sandbox dashboard with:
-
-```bash
-https://your-public-test-domain/api/webhooks/cashfree
-```
-
-For local testing, use an HTTPS tunnel such as ngrok and register the public URL in Cashfree. Keep the raw request body intact so the signed webhook can be verified.
-
-Required webhook events:
-
-- Cashfree payment success
-- Cashfree payment failed
-- Cashfree payment user dropped
-
-## Demo Accounts
-
-After `npm run seed`, demo users use:
-
-```text
-Password: FreelanceHub123!
-```
-
-Examples:
-
-```text
-client@freelancehub.local
-maya@freelancehub.local
-jon@freelancehub.local
-```
-
-## Production Checklist
-
-- Use HTTPS and set `NODE_ENV=production`.
-- Set real `APP_URL` and `CLIENT_URL`.
-- Use Cashfree Sandbox first, then switch to production keys after webhook testing and merchant approval.
-- Activate Cashfree Easy Split before enabling seller bank/UPI settlements.
-- Verify payout timing and marketplace legal requirements.
-- Use a real transactional email provider.
-- Add domain-level email authentication: SPF, DKIM, and DMARC.
-- Restrict MongoDB Atlas network access to your deployment environment.
-- Add automated tests before handling real customer funds.
+1. Push your repository to GitHub.
+2. Import the repository in [Vercel](https://vercel.com/new).
+3. Set Environment Variables in Vercel:
+   - `NODE_ENV`: `production`
+   - `JWT_SECRET`: Any random secure string
+4. In [Firebase Console > Authentication > Settings > Authorized Domains](https://console.firebase.google.com/project/freelancer-hub-1edff/authentication/settings), add your live Vercel domain.

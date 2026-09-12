@@ -55,7 +55,7 @@ servicesRouter.get(
     const services = await Service.find(filter)
       .sort(mongoSort)
       .limit(48)
-      .populate("seller", "name profile stripeOnboardingComplete");
+      .populate("seller", "name profile avatar");
 
     res.json({ services });
   }),
