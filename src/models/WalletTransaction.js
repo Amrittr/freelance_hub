@@ -41,7 +41,8 @@ export class WalletTransaction {
     return walletTransactionCollection.find(filter);
   }
 
-  static async findOne(filter = {}) {
+  // Non-async: returns SingleQueryCursor that is thenable and chainable
+  static findOne(filter = {}) {
     return walletTransactionCollection.findOne(filter);
   }
 

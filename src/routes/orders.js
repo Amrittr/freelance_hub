@@ -13,6 +13,11 @@ import { getWalletSnapshot } from "../services/wallet.js";
 
 export const ordersRouter = Router();
 
+/** Firebase IDs are plain strings — no Mongoose ObjectId.equals() needed */
+function idsMatch(a, b) {
+  return String(a?._id ?? a) === String(b?._id ?? b);
+}
+
 const checkoutSchema = z.object({
   body: z.object({
     serviceId: z.string().min(1),
@@ -99,7 +104,7 @@ ordersRouter.post(
       throw error;
     }
 
-    if (service.seller._id.equals(req.user._id)) {
+    if (idsMatch(service.seller._id, req.user._id)) {
       const error = new Error("You cannot buy your own service.");
       error.statusCode = 400;
       throw error;
@@ -245,7 +250,7 @@ ordersRouter.post(
     order.addEvent("dispute_opened", req.validated.body.reason, req.user._id);
     await order.save();
 
-    const recipient = order.client._id.equals(req.user._id) ? order.freelancer : order.client;
+    const recipient = idsMatch(order.client._id, req.user._id) ? order.freelancer : order.client;
     await sendOrderEmail({
       user: recipient,
       subject: "Dispute opened",
@@ -314,7 +319,7 @@ ordersRouter.post(
   validate(messageSchema),
   asyncHandler(async (req, res) => {
     const order = await loadParticipantOrder(req.validated.params.id, req.user._id);
-    const recipient = order.client._id.equals(req.user._id) ? order.freelancer : order.client;
+    const recipient = idsMatch(order.client._id, req.user._id) ? order.freelancer : order.client;
     const message = await Message.create({
       order: order._id,
       sender: req.user._id,
@@ -355,7 +360,7 @@ async function loadParticipantOrder(orderId, userId) {
 }
 
 function assertClient(order, userId) {
-  if (!order.client._id.equals(userId)) {
+  if (!idsMatch(order.client._id, userId)) {
     const error = new Error("Only the client can perform this action.");
     error.statusCode = 403;
     throw error;
@@ -363,7 +368,7 @@ function assertClient(order, userId) {
 }
 
 function assertFreelancer(order, userId) {
-  if (!order.freelancer._id.equals(userId)) {
+  if (!idsMatch(order.freelancer._id, userId)) {
     const error = new Error("Only the freelancer can perform this action.");
     error.statusCode = 403;
     throw error;

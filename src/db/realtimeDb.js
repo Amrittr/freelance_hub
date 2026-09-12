@@ -1,9 +1,21 @@
 import crypto from "crypto";
-import { ref, get, set, remove, update } from "firebase/database";
+import { ref, get, set, remove } from "firebase/database";
 import { rtdb } from "../config/firebase.js";
 
 function generateId() {
   return crypto.randomBytes(12).toString("hex");
+}
+
+/** Firebase RTDB rejects undefined values \u2014 replace them with null */
+function stripUndefined(obj) {
+  if (obj === undefined) return null;
+  if (obj === null || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) return obj.map(stripUndefined);
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) {
+    out[k] = stripUndefined(v);
+  }
+  return out;
 }
 
 function cloneDeep(obj) {
@@ -76,7 +88,6 @@ export class QueryCursor {
     this._limit = null;
     this._skip = 0;
     this._populates = [];
-    this._selectFields = null;
   }
 
   sort(sortObj) {
@@ -94,13 +105,13 @@ export class QueryCursor {
     return this;
   }
 
-  select(fieldsStr) {
-    this._selectFields = fieldsStr;
+  // select() is a no-op in Firebase adapter — all fields are always loaded.
+  select(_fieldsStr) {
     return this;
   }
 
-  populate(field, select) {
-    this._populates.push({ field, select });
+  populate(field, selectStr) {
+    this._populates.push({ field, select: selectStr });
     return this;
   }
 
@@ -134,7 +145,6 @@ export class QueryCursor {
 
     const instantiated = docs.map((d) => this.collection.instantiate(d));
 
-    // Handle relations population
     for (const pop of this._populates) {
       const targetFields = pop.field.split(/\s+/).filter(Boolean);
       for (const singleField of targetFields) {
@@ -145,6 +155,40 @@ export class QueryCursor {
     }
 
     return instantiated;
+  }
+
+  then(resolve, reject) {
+    return this.exec().then(resolve, reject);
+  }
+}
+
+/**
+ * SingleQueryCursor — same as QueryCursor but resolves to a single doc (or null).
+ * Returned by findOne() so .select() and .populate() can be chained on it.
+ */
+export class SingleQueryCursor {
+  constructor(collection, filter = {}) {
+    this._cursor = new QueryCursor(collection, filter);
+  }
+
+  select(_fieldsStr) {
+    // no-op — Firebase always stores all fields
+    return this;
+  }
+
+  populate(field, selectStr) {
+    this._cursor.populate(field, selectStr);
+    return this;
+  }
+
+  sort(sortObj) {
+    this._cursor.sort(sortObj);
+    return this;
+  }
+
+  async exec() {
+    const results = await this._cursor.exec();
+    return results[0] || null;
   }
 
   then(resolve, reject) {
@@ -206,7 +250,7 @@ export class RealtimeCollection {
     if (!rawVal) return;
 
     let targetCollectionName = null;
-    if (fieldName === "client" || fieldName === "freelancer" || fieldName === "seller" || fieldName === "user" || fieldName === "actor") {
+    if (fieldName === "client" || fieldName === "freelancer" || fieldName === "seller" || fieldName === "user" || fieldName === "actor" || fieldName === "sender" || fieldName === "recipient") {
       targetCollectionName = "users";
     } else if (fieldName === "service") {
       targetCollectionName = "services";
@@ -237,10 +281,9 @@ export class RealtimeCollection {
     return new QueryCursor(this, filter);
   }
 
-  async findOne(filter = {}) {
-    const cursor = new QueryCursor(this, filter);
-    const results = await cursor.exec();
-    return results[0] || null;
+  // Returns a SingleQueryCursor — thenable AND chainable (.select(), .populate())
+  findOne(filter = {}) {
+    return new SingleQueryCursor(this, filter);
   }
 
   async findById(id) {
@@ -259,13 +302,13 @@ export class RealtimeCollection {
   async create(data) {
     const _id = data._id ? String(data._id) : generateId();
     const now = new Date().toISOString();
-    const docData = {
+    const docData = stripUndefined({
       ...cloneDeep(data),
       _id,
       id: _id,
       createdAt: data.createdAt ? new Date(data.createdAt).toISOString() : now,
       updatedAt: data.updatedAt ? new Date(data.updatedAt).toISOString() : now,
-    };
+    });
 
     // Save to local cache
     this.cache.set(_id, docData);
@@ -283,12 +326,12 @@ export class RealtimeCollection {
   async save(instance) {
     const id = String(instance._id || instance.id);
     const now = new Date().toISOString();
-    const rawData = {
+    const rawData = stripUndefined({
       ...instance.toObject(),
       _id: id,
       id,
       updatedAt: now,
-    };
+    });
 
     this.cache.set(id, rawData);
 
@@ -301,14 +344,14 @@ export class RealtimeCollection {
   }
 
   async findOneAndUpdate(filter, updates, options = {}) {
-    const doc = await this.findOne(filter);
+    const doc = await this.findOne(filter).exec();
     if (!doc) return null;
 
     for (const [key, val] of Object.entries(updates)) {
       doc[key] = val;
     }
     await this.save(doc);
-    return options.new !== false ? doc : doc;
+    return doc;
   }
 
   async updateMany(filter, updates) {

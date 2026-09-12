@@ -51,7 +51,8 @@ export class Service {
     return serviceCollection.find(filter);
   }
 
-  static async findOne(filter = {}) {
+  // Non-async: returns a SingleQueryCursor that is thenable and chainable (.select, .populate)
+  static findOne(filter = {}) {
     return serviceCollection.findOne(filter);
   }
 

@@ -90,7 +90,8 @@ export class Order {
     return orderCollection.find(filter);
   }
 
-  static async findOne(filter = {}) {
+  // Non-async: returns a SingleQueryCursor that is thenable and chainable (.select, .populate)
+  static findOne(filter = {}) {
     return orderCollection.findOne(filter);
   }
 

@@ -38,7 +38,8 @@ export class Message {
     return messageCollection.find(filter);
   }
 
-  static async findOne(filter = {}) {
+  // Non-async: returns SingleQueryCursor that is thenable and chainable
+  static findOne(filter = {}) {
     return messageCollection.findOne(filter);
   }
 
