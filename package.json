@@ -1,0 +1,45 @@
+{
+  "name": "freelancehub",
+  "version": "1.0.0",
+  "description": "Escrow-style freelance marketplace with MongoDB, Cashfree checkout, auth, dashboards, and email notifications.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "seed": "node src/seed.js",
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/models/WalletTransaction.js && node --check src/services/profileAssistant.js && node --check src/services/wallet.js && node --check src/routes/orders.js && node --check src/routes/onboarding.js && node --check src/routes/payments.js && node --check public/app.js"
+  },
+  "keywords": [
+    "freelance",
+    "marketplace",
+    "escrow",
+    "stripe",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "firebase": "^12.19.0",
+    "google-auth-library": "^10.9.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.2",
+    "morgan": "^1.10.0",
+    "nodemailer": "^9.0.3",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

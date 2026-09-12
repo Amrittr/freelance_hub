@@ -1,0 +1,1413 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FreelanceHub | Escrow-backed freelance services</title>
+    <link rel="stylesheet" href="styles.css?v=150" />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer onload="if (typeof initGoogleAuth === 'function') initGoogleAuth();"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="module" src="firebase-config.js"></script>
+    <script src="app.js?v=151" defer></script>
+      
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand brand-pill" href="#home" aria-label="FreelanceHub home">
+        <span class="brand-mark">fh</span>
+        <span class="brand-name">FreelanceHub</span>
+      </a>
+
+      <nav class="main-nav main-nav-capsule" id="mainNav" aria-label="Main navigation">
+        <button class="active" type="button" data-app-page-nav="overview"><i data-lucide="layout-dashboard"></i><span>Overview</span></button>
+        <button type="button" data-app-page-nav="marketplace"><i data-lucide="store"></i><span>Marketplace</span></button>
+        <button type="button" data-app-page-nav="finance"><i data-lucide="wallet-cards"></i><span>Finance & Wallet</span></button>
+      </nav>
+
+      <div class="header-actions">
+        <button class="ghost-button hidden" type="button" id="dashboardButton">Dashboard</button>
+
+        <button class="theme-toggle-pill" type="button" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+          <span class="theme-option theme-light"><i data-lucide="sun"></i></span>
+          <span class="theme-option theme-dark active"><i data-lucide="moon"></i></span>
+        </button>
+
+        <button class="circle-button search-toggle-btn" type="button" id="searchToggleBtn" aria-label="Search" title="Search">
+          <i data-lucide="search"></i>
+        </button>
+
+        <div class="notification-wrap" id="notificationWrap">
+          <button class="circle-button" type="button" id="notificationButton" aria-expanded="false" aria-label="Open notifications">
+            <i data-lucide="bell"></i>
+            <span class="notification-badge hidden" id="notificationBadge">0</span>
+          </button>
+          <div class="notification-panel hidden" id="notificationPanel">
+            <div class="notification-panel-header">
+              <span>Notifications</span>
+              <button type="button" id="clearNotificationsButton">Clear all</button>
+            </div>
+            <div class="notification-list" id="notificationList">
+              <div class="notification-empty">No notifications yet</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="ghost-button hidden" type="button" id="logoutButton">Log out</button>
+        <button class="nav-signin-btn" type="button" id="signinButton">Sign in</button>
+        <button class="nav-cta-btn" type="button" id="joinButton">Join</button>
+
+        <div class="user-menu-wrap hidden" id="userMenuWrap">
+          <button class="user-avatar-button" type="button" id="userMenuButton" aria-expanded="false" aria-label="Open account menu">
+            <span class="user-avatar" id="userInitials">FH</span>
+            <span class="user-menu-name" id="userMenuName">Account</span>
+            <i data-lucide="chevron-down"></i>
+          </button>
+          <div class="user-menu hidden" id="userMenu">
+            <span class="user-menu-email" id="userMenuEmail"></span>
+            <button type="button" data-app-page-nav="overview"><i data-lucide="layout-dashboard"></i>Workspace</button>
+            <button type="button" id="menuLogoutButton"><i data-lucide="log-out"></i>Log out</button>
+          </div>
+        </div>
+        <button class="menu-button" type="button" id="menuButton" aria-label="Open menu" title="Open menu">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </header>
+
+    <main id="home">
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-shell">
+          <div class="hero-browser-bar" aria-hidden="true">
+            <span class="browser-dots"><i></i><i></i><i></i></span>
+            <span class="browser-address"></span>
+            <span class="browser-status">FreelanceHub / protected projects</span>
+          </div>
+          <div class="hero-inner">
+            <div class="hero-content">
+              <div class="hero-topline">
+                <span><strong>01</strong> A calmer way to work together</span>
+                <span>Escrow-backed from brief to release <i data-lucide="arrow-up-right"></i></span>
+              </div>
+              <h1 id="heroTitle">Find the right person.</h1>
+              <p class="hero-copy">
+                Hire focused independent talent with a protected budget, or turn your best skill into a service people can trust.
+              </p>
+
+              <div class="hero-paths" aria-label="Choose your path">
+                <button class="hero-path" type="button" data-scroll-target="seller">
+                  <span class="hero-path-title">I want to freelance</span>
+                  <span>Build your profile and package what you do best.</span>
+                  <i data-lucide="arrow-up-right"></i>
+                </button>
+                <button class="hero-path" type="button" data-scroll-target="services">
+                  <span class="hero-path-title">I want to hire</span>
+                  <span>Find a specialist and fund the work with confidence.</span>
+                  <i data-lucide="arrow-up-right"></i>
+                </button>
+              </div>
+
+              <form class="hero-search" id="heroSearch" role="search">
+                <i data-lucide="search"></i>
+                <input id="searchInput" type="search" placeholder="What do you need help with?" autocomplete="off" />
+                <button type="submit">Find talent <i data-lucide="arrow-up-right"></i></button>
+              </form>
+
+              <div class="trend-row" aria-label="Popular searches">
+                <span>Explore:</span>
+                <button type="button" data-query="AI agents">AI agents</button>
+                <button type="button" data-query="Logo design">Logo design</button>
+                <button type="button" data-query="Shopify">Shopify</button>
+                <button type="button" data-query="Video captions">Video captions</button>
+              </div>
+            </div>
+
+            <div class="hero-visual" aria-label="A funded freelance project workspace">
+              <div class="hero-photo-frame">
+                <img src="assets/freelancehub-workspace.png" alt="Creative freelance workspace with a laptop, payment confirmation, and project materials" />
+              </div>
+              <div class="hero-orbit hero-orbit-coral" aria-hidden="true"></div>
+              <div class="hero-orbit hero-orbit-blue" aria-hidden="true"></div>
+              <div class="hero-protection-note">
+                <i data-lucide="shield-check"></i>
+                <span>Protected<br />project</span>
+              </div>
+              <div class="hero-escrow-note">
+                <strong>Escrow</strong>
+                <span>Held until approval</span>
+              </div>
+              <div class="hero-profile-note">
+                <span class="hero-profile-mark"><i data-lucide="sparkles"></i></span>
+                <span><strong>Talent ready</strong><small>Match with intent</small></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="trusted-strip" aria-label="Marketplace benefits">
+        <span class="trust-intro">Built for practical projects, from first brief to final handoff.</span>
+        <span><i data-lucide="clock-3"></i> Fast turnaround</span>
+        <span><i data-lucide="badge-check"></i> Clear deliverables</span>
+        <span><i data-lucide="wallet-cards"></i> Protected release</span>
+      </section>
+
+      <!-- ── How Escrow Works ── -->
+      <section class="info-poster" id="how-it-works-poster" aria-labelledby="escrowHowTitle">
+        <div class="info-poster-inner">
+          <p class="eyebrow">How it works</p>
+          <h2 id="escrowHowTitle">Protected from brief to release.</h2>
+          <div class="info-poster-steps">
+            <div class="info-step">
+              <span class="info-step-num">01</span>
+              <i data-lucide="file-text"></i>
+              <h3>Post a brief</h3>
+              <p>Describe what you need. Set a budget and timeline that works for you.</p>
+            </div>
+            <div class="info-step">
+              <span class="info-step-num">02</span>
+              <i data-lucide="shield-check"></i>
+              <h3>Funds held in escrow</h3>
+              <p>Your payment is secured in escrow the moment the order starts. Nobody touches it until the work is approved.</p>
+            </div>
+            <div class="info-step">
+              <span class="info-step-num">03</span>
+              <i data-lucide="check-circle"></i>
+              <h3>Approve &amp; release</h3>
+              <p>Review the delivery, request revisions if needed, and release payment only when you are satisfied.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Marketplace Stats Ticker ── -->
+      <section class="stats-ticker" aria-label="Platform statistics">
+        <div class="stats-ticker-inner">
+          <div class="stat-block"><strong>12,400+</strong><span>Active Freelancers</span></div>
+          <div class="stat-block"><strong>₹8.2 Cr</strong><span>Protected in Escrow</span></div>
+          <div class="stat-block"><strong>98.7%</strong><span>Satisfaction Rate</span></div>
+          <div class="stat-block"><strong>24 hrs</strong><span>Avg. First Delivery</span></div>
+        </div>
+      </section>
+
+      <div class="marketplace-page" id="marketplacePage" data-app-page="marketplace">
+      <section class="category-section" id="categories" aria-labelledby="categoryTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Explore services</p>
+            <h2 id="categoryTitle">Popular categories</h2>
+          </div>
+          <div class="section-actions">
+            <button class="circle-button" type="button" id="categoryPrev" aria-label="Previous categories" title="Previous">
+              <i data-lucide="arrow-left"></i>
+            </button>
+            <button class="circle-button" type="button" id="categoryNext" aria-label="Next categories" title="Next">
+              <i data-lucide="arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="category-rail" id="categoryRail" tabindex="0" aria-label="Service categories">
+          <button class="category-tile active" type="button" data-category="all">
+            <span class="category-icon"><i data-lucide="sparkles"></i></span>
+            <span class="category-label">All services</span>
+          </button>
+          <button class="category-tile" type="button" data-category="design">
+            <span class="category-icon"><i data-lucide="pen-tool"></i></span>
+            <span class="category-label">Graphics & Design</span>
+          </button>
+          <button class="category-tile" type="button" data-category="tech">
+            <span class="category-icon"><i data-lucide="code-2"></i></span>
+            <span class="category-label">Programming & Tech</span>
+          </button>
+          <button class="category-tile" type="button" data-category="marketing">
+            <span class="category-icon"><i data-lucide="megaphone"></i></span>
+            <span class="category-label">Digital Marketing</span>
+          </button>
+          <button class="category-tile" type="button" data-category="video">
+            <span class="category-icon"><i data-lucide="clapperboard"></i></span>
+            <span class="category-label">Video & Animation</span>
+          </button>
+          <button class="category-tile" type="button" data-category="writing">
+            <span class="category-icon"><i data-lucide="file-pen-line"></i></span>
+            <span class="category-label">Writing & Translation</span>
+          </button>
+          <button class="category-tile" type="button" data-category="business">
+            <span class="category-icon"><i data-lucide="briefcase-business"></i></span>
+            <span class="category-label">Business</span>
+          </button>
+          <button class="category-tile" type="button" data-category="ai">
+            <span class="category-icon"><i data-lucide="bot"></i></span>
+            <span class="category-label">AI Services</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="services-section" id="services" aria-labelledby="serviceTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Handpicked micro-gigs</p>
+            <h2 id="serviceTitle">Specialists ready when the work cannot wait.</h2>
+          </div>
+          <div class="service-filter" aria-label="Sort services">
+            <button class="active" type="button" data-sort="recommended">Recommended</button>
+            <button type="button" data-sort="fast">24h delivery</button>
+            <button type="button" data-sort="budget">Under ₹5,000</button>
+          </div>
+        </div>
+
+        <div class="service-grid" id="serviceGrid" aria-live="polite"></div>
+      </section>
+
+      <!-- ── Trusted Results Showcase ── -->
+      <section class="showcase-band" id="showcase" aria-labelledby="showcaseTitle">
+        <div class="showcase-inner">
+          <p class="eyebrow">Real results</p>
+          <h2 id="showcaseTitle">Work that speaks for itself.</h2>
+          <div class="showcase-grid">
+            <div class="showcase-card">
+              <div class="showcase-card-img showcase-img-design"><i data-lucide="palette"></i></div>
+              <div class="showcase-card-body">
+                <strong>Brand refresh for Kite Market</strong>
+                <p>Complete visual identity, website, and marketing collateral delivered in 2 weeks.</p>
+                <span class="showcase-tag">Design</span>
+              </div>
+            </div>
+            <div class="showcase-card">
+              <div class="showcase-card-img showcase-img-ai"><i data-lucide="bot"></i></div>
+              <div class="showcase-card-body">
+                <strong>AI chatbot for ScribeHelp</strong>
+                <p>Custom GPT-powered support agent handling 80% of incoming queries autonomously.</p>
+                <span class="showcase-tag">AI Services</span>
+              </div>
+            </div>
+            <div class="showcase-card">
+              <div class="showcase-card-img showcase-img-marketing"><i data-lucide="trending-up"></i></div>
+              <div class="showcase-card-body">
+                <strong>SEO overhaul for Crafters&trade;</strong>
+                <p>Organic traffic grew 340% in 3 months with a focused content and technical SEO strategy.</p>
+                <span class="showcase-tag">Marketing</span>
+              </div>
+            </div>
+          </div>
+          <p class="showcase-cta"><span>Every project on FreelanceHub is funded, tracked, and released through escrow.</span></p>
+        </div>
+      </section>
+
+      <!-- ── Become a Seller CTA ── -->
+      <section class="seller-cta" id="seller-poster" aria-labelledby="sellerCtaTitle">
+        <div class="seller-cta-inner">
+          <div class="seller-cta-text">
+            <p class="eyebrow">For freelancers</p>
+            <h2 id="sellerCtaTitle">Turn your skill into income.</h2>
+            <p>Join thousands of independent professionals earning on their own terms. Create a free profile, publish a service, and get your first funded order — all protected by escrow.</p>
+            <ul class="seller-cta-list">
+              <li><i data-lucide="circle-check"></i> Free to join, no upfront costs</li>
+              <li><i data-lucide="circle-check"></i> Get paid the moment the client approves</li>
+              <li><i data-lucide="circle-check"></i> AI-powered profile co-pilot</li>
+              <li><i data-lucide="circle-check"></i> Built-in dispute resolution</li>
+            </ul>
+            <button class="join-button" type="button" id="sellerPosterButton">Start selling</button>
+          </div>
+          <div class="seller-cta-visual">
+            <img src="assets/seller-workbench.svg" alt="Freelancer workbench illustration" />
+          </div>
+        </div>
+      </section>
+
+      </div>
+
+      <section class="dashboard-section hidden app-page" id="dashboard" data-app-page="overview" aria-labelledby="dashboardTitle">
+        <div class="dashboard-welcome">
+          <div class="dashboard-welcome-copy">
+            <p class="eyebrow"><span class="presence-dot"></span><span id="dashboardRoleLabel">Your workspace</span></p>
+            <h2 id="dashboardTitle"><span id="dashboardGreeting">Make good work happen.</span></h2>
+            <p id="dashboardSubcopy">Everything important is gathered here: your next move, active work, and protected payments.</p>
+          </div>
+          <div class="dashboard-welcome-tools">
+            <div class="service-filter" aria-label="Dashboard role">
+              <button class="active" type="button" data-dashboard-role="client">Client</button>
+              <button type="button" data-dashboard-role="freelancer">Freelancer</button>
+            </div>
+            <div class="dashboard-progress-card">
+              <div>
+                <span>Workspace foundation</span>
+                <strong id="dashboardProgress">0%</strong>
+              </div>
+              <div class="progress-track" aria-label="Workspace foundation progress"><span id="dashboardProgressBar"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="finance-bento-grid overview-bento-grid">
+          <!-- COLUMN 1 -->
+          <div class="bento-col col-left">
+            <article class="bento-card card-total-balance">
+              <div class="bento-card-header">
+                <span class="bento-title">Protected Funds</span>
+                <span class="bento-badge badge-green">Active Escrow</span>
+              </div>
+              <div class="bento-amount" id="dashboardFunds">₹20,000</div>
+              <p class="bento-subcopy" style="font-size:0.84rem;color:var(--muted);margin-bottom:12px;">Active funded milestone commitments locked in zero-risk escrow.</p>
+              <div class="bento-chart-container">
+                <canvas id="overviewChartCanvas" aria-label="Protected funds activity" style="width:100%;height:120px;"></canvas>
+              </div>
+              <div class="chart-month-labels">
+                <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+              </div>
+            </article>
+
+            <article class="bento-card card-debit-stack">
+              <div class="card-stack-visual">
+                <div class="stacked-card card-cyan"></div>
+                <div class="stacked-card card-yellow"></div>
+                <div class="stacked-card card-pink"></div>
+                <div class="main-debit-card">
+                  <div class="debit-card-top">
+                    <div>
+                      <span class="debit-label">Workspace Card</span>
+                      <small class="debit-num">**** 1092</small>
+                    </div>
+                    <span class="debit-brand">VISA</span>
+                  </div>
+                  <div class="debit-card-bottom">
+                    <strong class="debit-amount" id="dashboardWalletBalance">₹12,200</strong>
+                    <i data-lucide="rss" class="contactless-icon"></i>
+                  </div>
+                </div>
+              </div>
+              <button class="bento-btn-dark wide" type="button" data-app-page-nav="finance">
+                <i data-lucide="arrow-right"></i> Open Finance & Wallet
+              </button>
+            </article>
+          </div>
+
+          <!-- COLUMN 2 -->
+          <div class="bento-col col-mid">
+            <article class="bento-card card-mini-metric">
+              <div class="mini-metric-content">
+                <div class="mini-metric-info">
+                  <div class="bento-card-header">
+                    <span class="bento-title">Active Orders</span>
+                    <span class="bento-badge badge-green">In Progress</span>
+                  </div>
+                  <div class="bento-amount-sm" id="dashboardActive">2</div>
+                  <small style="color:var(--muted);font-size:0.78rem;">Orders currently moving forward</small>
+                </div>
+                <div class="mini-bar-graphic cyan-bars">
+                  <span style="height:40%"></span><span style="height:65%"></span><span style="height:85%"></span><span style="height:100%"></span>
+                </div>
+              </div>
+            </article>
+
+            <article class="bento-card card-mini-metric">
+              <div class="mini-metric-content">
+                <div class="mini-metric-info">
+                  <div class="bento-card-header">
+                    <span class="bento-title">Review Queue</span>
+                    <span class="bento-badge badge-gray">Action Required</span>
+                  </div>
+                  <div class="bento-amount-sm" id="dashboardReview">1</div>
+                  <small style="color:var(--muted);font-size:0.78rem;">Deliveries awaiting approval</small>
+                </div>
+                <div class="mini-stripe-graphic pink-stripes">
+                  <div class="progress-bar-inner" style="width: 50%;"></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="bento-card card-mini-metric">
+              <div class="mini-metric-content">
+                <div class="mini-metric-info">
+                  <div class="bento-card-header">
+                    <span class="bento-title">Unread Messages</span>
+                    <span class="bento-badge badge-green">Live Updates</span>
+                  </div>
+                  <div class="bento-amount-sm" id="dashboardMessages">1</div>
+                  <small style="color:var(--muted);font-size:0.78rem;">New workspace updates</small>
+                </div>
+                <div class="mini-icon-badge" style="width:40px;height:40px;border-radius:50%;background:rgba(56,189,248,0.15);display:grid;place-items:center;color:#38bdf8;">
+                  <i data-lucide="messages-square"></i>
+                </div>
+              </div>
+            </article>
+
+            <article class="bento-card card-tx-history">
+              <div class="bento-card-header">
+                <span class="bento-heading-lg">Recent Deliveries</span>
+                <button class="bento-link-btn" type="button" data-app-page-nav="marketplace">Marketplace</button>
+              </div>
+              <div class="tx-history-list" id="overviewOrdersList">
+                <div class="tx-item">
+                  <div class="tx-icon icon-apple"><i data-lucide="layers-3"></i></div>
+                  <div class="tx-details"><strong>Full-Stack E-Commerce App</strong><small>Delivery in 2 days</small></div>
+                  <div class="tx-amount positive">₹15,000</div>
+                </div>
+                <div class="tx-item">
+                  <div class="tx-icon icon-amazon"><i data-lucide="sparkles"></i></div>
+                  <div class="tx-details"><strong>AI Logo & Brand Identity</strong><small>Under Review</small></div>
+                  <div class="tx-amount positive">₹5,000</div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- COLUMN 3 -->
+          <div class="bento-col col-right">
+            <article class="bento-card card-escrow-yield">
+              <div class="escrow-yield-content">
+                <span class="escrow-yield-eyebrow"><i data-lucide="sparkles"></i> Service Impressions</span>
+                <h3 class="escrow-yield-title">4,279 Views</h3>
+                <p class="escrow-yield-desc">+12% increase in gig visibility over the last 30 days.</p>
+                <button class="bento-btn-dark" type="button" data-app-page-nav="marketplace">
+                  View Marketplace
+                </button>
+              </div>
+            </article>
+
+            <article class="bento-card card-quick-transfer">
+              <div class="bento-card-header">
+                <span class="bento-heading-lg">Performance Scores</span>
+                <button class="bento-icon-link" type="button"><i data-lucide="award"></i></button>
+              </div>
+              <div class="perf-scores-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">
+                <div class="perf-score-box" style="background:rgba(0,0,0,0.04);padding:12px;border-radius:12px;">
+                  <span style="font-size:0.75rem;color:var(--muted);display:block;">Response Rate</span>
+                  <strong style="font-size:1.2rem;color:#22c55e;">99.2%</strong>
+                  <small style="display:block;font-size:0.7rem;color:var(--muted);">&lt; 1hr avg</small>
+                </div>
+                <div class="perf-score-box" style="background:rgba(0,0,0,0.04);padding:12px;border-radius:12px;">
+                  <span style="font-size:0.75rem;color:var(--muted);display:block;">Delivery Rate</span>
+                  <strong style="font-size:1.2rem;color:#38bdf8;">98.5%</strong>
+                  <small style="display:block;font-size:0.7rem;color:var(--muted);">On-time score</small>
+                </div>
+              </div>
+            </article>
+
+            <article class="bento-card card-budget-chart">
+              <div class="bento-card-header">
+                <span class="bento-heading-lg">Work Performance</span>
+                <button class="bento-icon-link" type="button"><i data-lucide="trending-up"></i></button>
+              </div>
+              <div class="budget-legend">
+                <span class="legend-chip chip-purple"><i></i> Completed</span>
+                <span class="legend-chip chip-pink"><i></i> Review</span>
+                <span class="legend-chip chip-cyan"><i></i> Active</span>
+              </div>
+              <div class="budget-chart-wrap">
+                <canvas id="overviewBudgetCanvas" aria-label="Work performance chart" style="width:100%;height:150px;"></canvas>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <section class="bento-card dashboard-next" aria-labelledby="nextStepsTitle" style="margin-top:24px;">
+          <div class="panel-heading" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div>
+              <p class="eyebrow" style="font-size:0.78rem;font-weight:700;color:#38bdf8;text-transform:uppercase;">Keep moving</p>
+              <h3 id="nextStepsTitle" style="font-size:1.25rem;font-weight:750;color:var(--ink);margin:4px 0 0;">Your next best moves</h3>
+            </div>
+            <button class="circle-button" id="refreshDashboard" type="button" aria-label="Refresh dashboard" title="Refresh">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+          </div>
+          <div class="dashboard-next-grid" id="dashboardNextSteps"></div>
+        </section>
+
+        <section class="bento-card dashboard-activity hidden" id="dashboardActivityPanel" style="margin-top: 24px;">
+          <div class="bento-card-header" style="margin-bottom: 18px !important;">
+            <div>
+              <p class="eyebrow" style="font-size: 0.78rem; font-weight: 700; color: #a855f7; text-transform: uppercase; margin-bottom: 2px;">Timeline</p>
+              <h3 style="font-size: 1.25rem; font-weight: 750; color: var(--ink); margin: 0;">Recent activity</h3>
+            </div>
+            <span class="bento-badge badge-purple"><i data-lucide="history" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Live Updates</span>
+          </div>
+          <div class="bento-timeline-grid" id="activityTimeline"></div>
+        </section>
+        
+        <section class="dashboard-emails hidden" id="dashboardEmailPanel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">System Logs</p>
+              <h3>Demo Email Logs</h3>
+            </div>
+            <span class="demo-chip"><i data-lucide="flask-conical"></i> Demo mode</span>
+          </div>
+          <div class="email-log-list" id="emailLogList"></div>
+        </section>
+
+        <div class="dashboard-workspace" style="margin-top: 24px;">
+          <article class="bento-card orders-panel">
+            <div class="bento-card-header" style="margin-bottom: 18px !important;">
+              <div>
+                <p class="eyebrow" style="font-size: 0.78rem; font-weight: 700; color: #22c55e; text-transform: uppercase; margin-bottom: 2px;">Orders</p>
+                <h3 style="font-size: 1.25rem; font-weight: 750; color: var(--ink); margin: 0;">Recent work</h3>
+              </div>
+              <span class="bento-badge badge-green"><i data-lucide="activity" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Active Ledger</span>
+            </div>
+            <div class="order-list" id="orderList"></div>
+          </article>
+
+          <article class="bento-card seller-tools" id="sellerTools">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Seller tools</p>
+                <h3>Publish a service</h3>
+              </div>
+              <button class="join-button" id="connectPayoutsButton" type="button">Set up payouts</button>
+            </div>
+            <form class="service-form" id="serviceForm">
+              <label>
+                <span>Title</span>
+                <input name="title" required minlength="12" maxlength="140" placeholder="I will..." />
+              </label>
+              <div class="form-grid">
+                <label>
+                  <span>Category</span>
+                  <select name="category">
+                    <option value="design">Graphics & Design</option>
+                    <option value="tech">Programming & Tech</option>
+                    <option value="marketing">Digital Marketing</option>
+                    <option value="video">Video & Animation</option>
+                    <option value="writing">Writing & Translation</option>
+                    <option value="business">Business</option>
+                    <option value="ai">AI Services</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Price</span>
+                  <input name="price" required type="number" min="5" step="1" value="95" />
+                </label>
+              </div>
+              <div class="form-grid">
+                <label>
+                  <span>Delivery days</span>
+                  <input name="deliveryDays" required type="number" min="1" max="90" value="2" />
+                </label>
+                <label>
+                  <span>Revisions</span>
+                  <input name="revisions" required type="number" min="0" max="20" value="1" />
+                </label>
+              </div>
+              <label>
+                <span>Description</span>
+                <textarea name="description" required minlength="40" maxlength="1600" placeholder="Describe exactly what buyers receive."></textarea>
+              </label>
+              <label>
+                <span>Tags</span>
+                <input name="tags" placeholder="logo, website, ai agents" />
+              </label>
+              <button class="join-button wide" type="submit">Publish service</button>
+            </form>
+          </article>
+        </div>
+
+        <!-- ── Dashboard Platform Stats Banner ── -->
+        <section class="dash-info-banner" aria-label="Platform insights">
+          <div class="dash-info-banner-inner">
+            <div class="dash-info-item">
+              <i data-lucide="globe"></i>
+              <div><strong>18 Countries</strong><span>Freelancers from around the world</span></div>
+            </div>
+            <div class="dash-info-item">
+              <i data-lucide="timer"></i>
+              <div><strong>&lt; 2 hours</strong><span>Average response time</span></div>
+            </div>
+            <div class="dash-info-item">
+              <i data-lucide="trending-up"></i>
+              <div><strong>34% Growth</strong><span>Month-over-month platform growth</span></div>
+            </div>
+            <div class="dash-info-item">
+              <i data-lucide="award"></i>
+              <div><strong>4.9 / 5</strong><span>Average freelancer rating</span></div>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <section class="workspace-page finance-page app-page hidden" id="financePage" data-app-page="finance" aria-labelledby="financeTitle">
+        <div class="workspace-page-heading">
+          <div>
+            <p class="eyebrow">Financial &amp; Wallet Dashboard</p>
+            <h2 id="financeTitle">See where your work, wallet, and money are moving.</h2>
+          </div>
+          <span class="finance-period"><i data-lucide="database"></i> Live Database Sync</span>
+        </div>
+
+        <div class="finance-bento-grid">
+          <!-- COLUMN 1 -->
+          <div class="bento-col col-left">
+            <!-- 1. Total Balance Card -->
+            <article class="bento-card card-total-balance">
+              <div class="bento-card-header">
+                <span class="bento-title">Total Wallet Balance</span>
+                <span class="bento-badge badge-green">Live DB</span>
+              </div>
+              <div class="bento-amount" id="financeTotalBalance">₹0.00</div>
+              <div class="bento-chart-container">
+                <canvas id="financeChartCanvas" aria-label="Total balance line chart" style="width:100%;height:130px;"></canvas>
+              </div>
+              <div class="chart-month-labels">
+                <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+              </div>
+            </article>
+
+            <!-- 2. Wallet Debit Card & Top-Up Widget -->
+            <article class="bento-card card-debit-stack">
+              <div class="card-stack-visual">
+                <div class="stacked-card card-cyan"></div>
+                <div class="stacked-card card-yellow"></div>
+                <div class="stacked-card card-pink"></div>
+                <div class="main-debit-card">
+                  <div class="debit-card-top">
+                    <div>
+                      <span class="debit-label">Debit card</span>
+                      <small class="debit-num">**** 1092</small>
+                    </div>
+                    <span class="debit-brand">VISA</span>
+                  </div>
+                  <div class="debit-card-bottom">
+                    <strong class="debit-amount" id="financeWalletBalance">₹0.00</strong>
+                    <i data-lucide="rss" class="contactless-icon"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Embedded Top-Up Form -->
+              <div class="wallet-topup-bento-form" style="margin-top:16px;">
+                <div class="wallet-presets" aria-label="Suggested top-up amounts" style="display:flex;gap:8px;margin-bottom:12px;">
+                  <button type="button" class="preset-btn" data-wallet-amount="500" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);background:rgba(0,0,0,0.03);font-size:0.82rem;font-weight:700;color:var(--ink);cursor:pointer;">₹500</button>
+                  <button type="button" class="preset-btn" data-wallet-amount="1000" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);background:rgba(0,0,0,0.03);font-size:0.82rem;font-weight:700;color:var(--ink);cursor:pointer;">₹1,000</button>
+                  <button type="button" class="preset-btn" data-wallet-amount="2500" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);background:rgba(0,0,0,0.03);font-size:0.82rem;font-weight:700;color:var(--ink);cursor:pointer;">₹2,500</button>
+                </div>
+                <div class="wallet-input-row" style="display:flex;gap:8px;align-items:center;">
+                  <div style="flex:1;position:relative;">
+                    <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--muted);">₹</span>
+                    <input id="walletAmount" type="number" min="50" max="100000" step="50" value="500" style="width:100%;padding:10px 10px 10px 24px;border-radius:10px;border:1px solid rgba(0,0,0,0.12);background:var(--paper);font-weight:700;color:var(--ink);box-sizing:border-box;" />
+                  </div>
+                  <button class="bento-btn-dark" type="button" id="walletTopupButton" style="margin-top:0;padding:10px 16px;white-space:nowrap;">
+                    <i data-lucide="plus-circle"></i> Add Funds
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- COLUMN 2 -->
+          <div class="bento-col col-mid">
+            <!-- 1. Total Earnings / Credits Widget -->
+            <article class="bento-card card-mini-metric">
+              <div class="mini-metric-content">
+                <div class="mini-metric-info">
+                  <div class="bento-card-header">
+                    <span class="bento-title">Total Income</span>
+                    <span class="bento-badge badge-green">Live Credits</span>
+                  </div>
+                  <div class="bento-amount-sm" id="financeIncoming">₹0.00</div>
+                </div>
+                <div class="mini-bar-graphic cyan-bars">
+                  <span style="height:35%"></span><span style="height:50%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:85%"></span><span style="height:100%"></span>
+                </div>
+              </div>
+            </article>
+
+            <!-- 2. Protected Escrow Vaults Widget -->
+            <article class="bento-card card-mini-metric">
+              <div class="mini-metric-content">
+                <div class="mini-metric-info">
+                  <div class="bento-card-header">
+                    <span class="bento-title">Protected Escrow</span>
+                    <span class="bento-badge badge-gray">Active Vaults</span>
+                  </div>
+                  <div class="bento-amount-sm" id="financeProtected">₹0.00</div>
+                </div>
+                <div class="mini-stripe-graphic pink-stripes">
+                  <div class="progress-bar-inner" style="width: 77%;"></div>
+                </div>
+              </div>
+            </article>
+
+            <!-- 3. Transaction History List -->
+            <article class="bento-card card-tx-history">
+              <div class="bento-card-header">
+                <span class="bento-heading-lg">Transaction Ledger</span>
+                <span class="bento-badge badge-green">Real-time DB</span>
+              </div>
+              <div class="tx-history-list" id="financeTxList"></div>
+            </article>
+          </div>
+
+          <!-- COLUMN 3 -->
+          <div class="bento-col col-right">
+            <!-- 1. Escrow Protection Card -->
+            <article class="bento-card card-escrow-yield">
+              <div class="escrow-yield-content">
+                <span class="escrow-yield-eyebrow"><i data-lucide="shield-check"></i> Escrow Guarantee</span>
+                <h3 class="escrow-yield-title">100% Protected Vaults</h3>
+                <p class="escrow-yield-desc">All milestone funds are locked in zero-risk escrow vaults until work is approved.</p>
+                <button class="bento-btn-dark" type="button" id="escrowVaultsBtn">
+                  View Escrow Security
+                </button>
+              </div>
+            </article>
+
+            <!-- 2. Quick Transfer Widget -->
+            <article class="bento-card card-quick-transfer">
+              <div class="bento-card-header">
+                <span class="bento-heading-lg">Quick transfer</span>
+                <button class="bento-icon-link" type="button" aria-label="Transfer"><i data-lucide="arrow-up-right"></i></button>
+              </div>
+              <div class="avatar-transfer-row">
+                <div class="transfer-avatar bg-rose">AS</div>
+                <div class="transfer-avatar bg-cyan">JD</div>
+                <div class="transfer-avatar bg-purple">MK</div>
+                <div class="transfer-avatar bg-amber">RL</div>
+                <button class="add-avatar-btn" type="button" id="quickTransferBtn" title="Add recipient"><i data-lucide="plus"></i></button>
+              </div>
+            </article>
+
+            <!-- 3. Budget Stacked Bar Chart -->
+            <article class="bento-card card-budget-chart">
+              <div class="bento-card-header">
+                <span class="bento-heading-lg">Budget</span>
+                <button class="bento-icon-link" type="button" aria-label="Budget details"><i data-lucide="arrow-up-right"></i></button>
+              </div>
+              <div class="budget-legend">
+                <span class="legend-chip chip-purple"><i></i> Income</span>
+                <span class="legend-chip chip-pink"><i></i> Expense</span>
+                <span class="legend-chip chip-cyan"><i></i> Saving</span>
+              </div>
+              <div class="budget-chart-wrap">
+                <canvas id="financeBudgetCanvas" aria-label="Budget stacked bar chart" style="width:100%;height:170px;"></canvas>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace-page gateway-page hidden app-page" id="gatewayPage" data-app-page="gateway" aria-labelledby="gatewayTitle">
+        <div class="gateway-container">
+          <div class="gateway-sidebar">
+            <div class="gateway-lock">
+              <i data-lucide="shield-check"></i>
+              <span>Secure Escrow Checkout</span>
+            </div>
+            <div class="gateway-summary">
+              <h3>Order Summary</h3>
+              <div class="summary-line">
+                <span id="gatewayItemTitle">Wallet Top-Up</span>
+                <strong id="gatewayItemPrice">₹0.00</strong>
+              </div>
+              <div class="summary-line fee-line">
+                <span>Platform Processing Fee (0.00%)</span>
+                <strong>₹0.00</strong>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-line total-line">
+                <span>Total Amount Due</span>
+                <strong id="gatewayTotalAmount">₹0.00</strong>
+              </div>
+            </div>
+            <div class="gateway-badges">
+              <span><i data-lucide="lock"></i> 256-bit SSL Encryption</span>
+              <span><i data-lucide="badge-check"></i> Certified Escrow Ledger</span>
+            </div>
+          </div>
+          <div class="gateway-main-panel">
+            <div class="gateway-header-row">
+              <h2 id="gatewayTitle">Select Payment Method</h2>
+              <button class="circle-button" type="button" id="cancelGatewayButton" aria-label="Cancel checkout">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
+            <div class="gateway-tab-row">
+              <button class="gateway-tab active" type="button" data-gateway-tab="card">
+                <i data-lucide="credit-card"></i> Card Payment
+              </button>
+              <button class="gateway-tab" type="button" data-gateway-tab="upi">
+                <i data-lucide="smartphone"></i> UPI Scan Code
+              </button>
+            </div>
+            
+            <!-- Card Checkout Panel -->
+                        <!-- Card Payment Panel -->
+            <div class="gateway-panel-content" id="gatewayCardPanel">
+              <div class="gateway-card-split-container">
+                
+                <!-- LEFT SIDEBAR: Saved Cards Stack & Up/Down Selector Controls -->
+                <div class="saved-cards-side-column" id="savedCardsSection">
+                  <div class="saved-cards-header">
+                    <div class="saved-cards-title">
+                      <i data-lucide="layers"></i>
+                      <span>Saved Cards</span>
+                      <span class="saved-cards-count" id="savedCardsCount">0</span>
+                    </div>
+                    <button type="button" class="btn-text-action" id="btnAddNewCard" title="Enter New Card Details">
+                      <i data-lucide="plus"></i> New Card
+                    </button>
+                  </div>
+
+                  <div class="cards-stack-interactive-row">
+                    <!-- The Staggered 3D Stack Container -->
+                    <div class="cards-stack-wrapper" id="cardsStackContainer">
+                      <!-- Stack cards rendered via JS -->
+                    </div>
+
+                    <!-- Up / Down Stack Navigation Controls -->
+                    <div class="cards-stack-nav-controls">
+                      <button type="button" class="stack-nav-btn" id="btnStackPrev" title="Previous Saved Card">
+                        <i data-lucide="chevron-up"></i>
+                      </button>
+                      <div class="stack-nav-indicator" id="stackNavIndicator">1/3</div>
+                      <button type="button" class="stack-nav-btn" id="btnStackNext" title="Next Saved Card">
+                        <i data-lucide="chevron-down"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- RIGHT COLUMN: 3D Interactive Card Preview + Input Form -->
+                <div class="gateway-card-form-column">
+                  <div class="card-interactive-wrapper">
+                    <div class="flip-card">
+                      <div class="flip-card-inner" id="cardFlipInner">
+                        <!-- Front -->
+                        <div class="flip-card-front">
+                          <div class="card-brand-row">
+                            <i data-lucide="sparkles" class="card-sparkle"></i>
+                            <span class="card-network-logo">VISA</span>
+                          </div>
+                          <div class="card-chip"></div>
+                          <div class="card-number-display" id="previewNumber">•••• •••• •••• ••••</div>
+                          <div class="card-details-row">
+                            <div class="card-holder-col">
+                              <span class="card-label">CARDHOLDER</span>
+                              <span class="card-val" id="previewHolder">YOUR NAME</span>
+                            </div>
+                            <div class="card-expires-col">
+                              <span class="card-label">EXPIRES</span>
+                              <span class="card-val" id="previewExpiry">MM/YY</span>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Back -->
+                        <div class="flip-card-back">
+                          <div class="card-black-strip"></div>
+                          <div class="card-cvv-box">
+                            <span class="card-label">CVV</span>
+                            <div class="card-cvv-whitebar" id="previewCvv">•••</div>
+                          </div>
+                          <div class="card-back-brand">VISA Secure</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="gateway-form">
+                    <label>
+                      <span>Card Number</span>
+                      <input type="text" id="gatewayCardNo" placeholder="4242 4242 4242 4242" maxlength="19" autocomplete="cc-number" />
+                    </label>
+                    <label>
+                      <span>Cardholder Name</span>
+                      <input type="text" id="gatewayCardName" placeholder="John Doe" maxlength="40" autocomplete="cc-name" />
+                    </label>
+                    <div class="form-row-2">
+                      <label>
+                        <span>Expiration Date</span>
+                        <input type="text" id="gatewayCardExpiry" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp" />
+                      </label>
+                      <label>
+                        <span>CVV / CVC</span>
+                        <input type="password" id="gatewayCardCvv" placeholder="123" maxlength="4" autocomplete="cc-csc" />
+                      </label>
+                    </div>
+                    <label class="save-method-checkbox">
+                      <input type="checkbox" id="saveCardCheckbox" checked />
+                      <span>Save this card for fast 1-click payments next time</span>
+                    </label>
+                    <button class="gateway-pay-btn" type="button" id="gatewayPayCardButton">
+                      <span>Pay Securely</span>
+                      <i data-lucide="shield-check"></i>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+            <!-- UPI Checkout Panel -->
+                        <!-- UPI Checkout Panel -->
+            <div class="gateway-panel-content hidden" id="gatewayUpiPanel">
+              <div class="saved-upi-section" id="savedUpiSection">
+                <div class="saved-upi-header">
+                  <i data-lucide="zap"></i>
+                  <span>Fast Pay with Saved UPI IDs</span>
+                </div>
+                <div class="saved-upi-chips" id="savedUpiChipsContainer">
+                  <!-- UPI chips rendered via JS -->
+                </div>
+              </div>
+              <div class="upi-qr-wrapper">
+                <div class="upi-qr-box">
+                  <div class="upi-qr-image" id="upiQrCodeContainer"></div>
+                  <div class="upi-qr-spinner" id="upiQrSpinner">
+                    <i data-lucide="loader-2" class="spin"></i>
+                    <span>Waiting for scanner...</span>
+                  </div>
+                </div>
+                <div class="upi-timer">
+                  <i data-lucide="clock"></i>
+                  <span>Scan QR code within <strong id="upiTimerMinutes">03:00</strong></span>
+                </div>
+              </div>
+              <div class="upi-details">
+                <p>Alternatively, trigger via Virtual Payment Address (VPA):</p>
+                                <label class="save-method-checkbox">
+                  <input type="checkbox" id="saveUpiCheckbox" checked />
+                  <span>Save this UPI VPA for future payments</span>
+                </label>
+                <div class="upi-vpa-row">
+                  <input type="text" id="gatewayUpiVpa" placeholder="username@upi" />
+                  <button class="join-button" type="button" id="gatewayPayUpiButton">Pay</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Processing State -->
+            <div class="gateway-processing hidden" id="gatewayProcessing">
+              <div class="processing-animation">
+                <div class="pulse-ring"></div>
+                <i data-lucide="lock" class="processing-icon"></i>
+              </div>
+              <h3>Authorizing Transaction</h3>
+              <p id="gatewayProcessingText">Securing escrow deposit ledger...</p>
+              <div class="processing-progress-bar"><span id="gatewayProgressBarInner"></span></div>
+            </div>
+            
+            <!-- Receipt Screen -->
+            <div class="gateway-receipt-panel hidden" id="gatewayReceiptPanel">
+              <div class="receipt-checkmark">
+                <i data-lucide="check-circle-2"></i>
+              </div>
+              <h2>Payment Successful</h2>
+              <p class="receipt-success-text">Your funds have been deposited in the platform escrow ledger.</p>
+              
+              <div class="receipt-details" id="receiptPrintableArea">
+                <div class="receipt-header">
+                  <h3>FreelanceHub Transaction Receipt</h3>
+                  <span class="receipt-date" id="receiptDate">Date: --/--/----</span>
+                </div>
+                <div class="receipt-row">
+                  <span>Transaction ID</span>
+                  <strong id="receiptTxId">TXN-xxxxxxx</strong>
+                </div>
+                <div class="receipt-row">
+                  <span>Merchant/Platform</span>
+                  <strong>FreelanceHub Escrow</strong>
+                </div>
+                <div class="receipt-row">
+                  <span>Sender Account</span>
+                  <strong id="receiptUser">User Name</strong>
+                </div>
+                <div class="receipt-row">
+                  <span>Payment Provider</span>
+                  <strong>FH Demo Ledger</strong>
+                </div>
+                <div class="receipt-divider"></div>
+                <div class="receipt-row">
+                  <span>Amount Credited</span>
+                  <strong id="receiptAmount">₹0.00</strong>
+                </div>
+                <div class="receipt-row">
+                  <span>Status</span>
+                  <span class="status-badge-succeeded">SUCCEEDED</span>
+                </div>
+              </div>
+              
+              <div class="receipt-actions">
+                <button class="circle-button" type="button" id="receiptDownloadPdf" title="Download PDF Receipt">
+                  <i data-lucide="download"></i>
+                </button>
+                <button class="join-button" type="button" id="receiptCloseButton">
+                  <span>Return to Workspace</span>
+                  <i data-lucide="arrow-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pro-band" id="pro" aria-labelledby="proTitle">
+        <div>
+          <p class="eyebrow">FreelanceHub Pro</p>
+          <h2 id="proTitle">Bring the right people around a bigger outcome.</h2>
+          <p>
+            Build a managed team from vetted freelancers, milestone funding, and a single escrow ledger for every delivery.
+          </p>
+        </div>
+        <button class="dark-button" type="button" id="proButton">
+          <span>Browse Pro talent</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </section>
+
+      <section class="feature-grid" id="how-it-works" aria-labelledby="escrowTitle">
+        <div class="feature-copy">
+          <p class="eyebrow">Built around safer payments</p>
+          <h2 id="escrowTitle">Escrow makes small jobs easier to trust.</h2>
+          <p>
+            Clients fund before work starts. Freelancers see that the budget is reserved. Funds release only after approval or resolution.
+          </p>
+          <div class="feature-list">
+            <span><i data-lucide="lock-keyhole"></i> Funds locked before delivery</span>
+            <span><i data-lucide="badge-check"></i> Verified seller history</span>
+            <span><i data-lucide="scale"></i> Dispute review when needed</span>
+          </div>
+        </div>
+        <div class="escrow-card" aria-label="Escrow example">
+          <div class="escrow-card-top">
+            <span>Active escrow</span>
+            <strong>₹35,000</strong>
+          </div>
+          <div class="escrow-flow">
+            <span class="done">Brief</span>
+            <span class="done">Funded</span>
+            <span class="done">Submitted</span>
+            <span>Release</span>
+          </div>
+          <div class="mini-ledger">
+            <p>Kite Market funded checkout UX audit</p>
+            <p>Maya uploaded annotated prototype notes</p>
+            <p>Client review due in 18h</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="seller-band" id="seller" aria-labelledby="sellerTitle">
+        <div class="seller-art" aria-hidden="true">
+          <img src="assets/seller-workbench.svg" alt="" />
+        </div>
+        <div class="seller-copy">
+          <p class="eyebrow">For freelancers</p>
+          <h2 id="sellerTitle">Turn your smallest skills into repeatable income.</h2>
+          <p>
+            Package focused services, set delivery times, and accept funded work without chasing deposits.
+          </p>
+          <button class="light-button" type="button" id="sellerButton">
+            <span>Start selling</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+      </section>
+
+      <section class="footer-market" aria-labelledby="footerTitle">
+        <div class="footer-brand">
+          <h2 id="footerTitle">FreelanceHub</h2>
+          <p>A focused freelance marketplace for work that deserves a clear brief, protected budget, and thoughtful handoff.</p>
+        </div>
+        <div class="footer-columns">
+          <div>
+            <h3>Categories</h3>
+            <a href="#categories">Graphics & Design</a>
+            <a href="#categories">Programming & Tech</a>
+            <a href="#categories">Digital Marketing</a>
+            <a href="#categories">AI Services</a>
+          </div>
+          <div>
+            <h3>Clients</h3>
+            <a href="#services">Find services</a>
+            <a href="#how-it-works">Escrow safety</a>
+            <a href="#pro">Managed teams</a>
+            <a href="#home">Post a brief</a>
+          </div>
+          <div>
+            <h3>Sellers</h3>
+            <a href="#seller">Become a seller</a>
+            <a href="#services">Package services</a>
+            <a href="#how-it-works">Payment protection</a>
+            <a href="#home">Seller resources</a>
+          </div>
+        </div>
+      </section>
+      
+      <footer class="workspace-footer">
+        <p>Protected by FreelanceHub Escrow &copy; 2026. All transactions are securely held until milestones are verified.</p>
+      </footer>
+    </main>
+
+    <dialog class="market-dialog auth-dialog-modern" id="joinDialog">
+      <form method="dialog" id="authForm">
+        <!-- Decorative orb -->
+        <div class="auth-orb" aria-hidden="true"></div>
+        <div class="auth-particles" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow" id="authEyebrow" style="color:#a855f7;font-weight:700;">Create your account</p>
+            <h2 id="authTitle" style="font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;">Join FreelanceHub</h2>
+          </div>
+          <button class="circle-button" type="button" formnovalidate data-close-dialog aria-label="Close" title="Close">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <div class="auth-tabs" aria-label="Authentication mode">
+          <button class="active" type="button" data-auth-mode="signup">Sign up</button>
+          <button type="button" data-auth-mode="login">Log in</button>
+        </div>
+
+        <!-- Google first (social login priority) -->
+        <div id="googleAuthButton" class="google-auth-wrapper"></div>
+        <div class="auth-divider"><span>or continue with email</span></div>
+
+        <label data-signup-only class="auth-input-modern">
+          <span><i data-lucide="user" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:6px;opacity:0.5;"></i>Full name</span>
+          <input type="text" name="name" autocomplete="name" minlength="2" maxlength="80" placeholder="Enter your name" />
+        </label>
+        <label class="auth-input-modern">
+          <span><i data-lucide="mail" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:6px;opacity:0.5;"></i>Email address</span>
+          <input type="email" name="email" autocomplete="email" required placeholder="you@example.com" />
+        </label>
+        <label class="auth-input-modern">
+          <span><i data-lucide="lock" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:6px;opacity:0.5;"></i>Password</span>
+          <input type="password" name="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters" />
+        </label>
+
+        <button class="auth-submit-modern" type="submit" value="default" id="authSubmit">
+          <span>Create account</span>
+          <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+        </button>
+
+        <div class="auth-trust-strip">
+          <span><i data-lucide="shield-check" style="width:12px;height:12px;"></i> Encrypted</span>
+          <span><i data-lucide="fingerprint" style="width:12px;height:12px;"></i> 2FA Ready</span>
+          <span><i data-lucide="globe" style="width:12px;height:12px;"></i> GDPR</span>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="market-dialog role-dialog" id="roleDialog" aria-labelledby="roleDialogTitle">
+      <div class="onboarding-shell">
+        <div class="onboarding-orbit" aria-hidden="true"><i data-lucide="sparkles"></i></div>
+        <p class="eyebrow">Start with your intent</p>
+        <h2 id="roleDialogTitle">What brings you to FreelanceHub?</h2>
+        <p class="dialog-copy">You can add the other role later. We will set up the workspace around what you want to do first.</p>
+        <div class="role-choice-grid">
+          <button class="role-choice role-choice-client" type="button" data-role-choice="client">
+            <span class="role-choice-icon"><i data-lucide="search-check"></i></span>
+            <span><strong>I want to hire</strong><small>Find focused help and manage protected projects.</small></span>
+            <i data-lucide="arrow-up-right"></i>
+          </button>
+          <button class="role-choice role-choice-freelancer" type="button" data-role-choice="freelancer">
+            <span class="role-choice-icon"><i data-lucide="wand-sparkles"></i></span>
+            <span><strong>I want to freelance</strong><small>Build your profile and package what you do best.</small></span>
+            <i data-lucide="arrow-up-right"></i>
+          </button>
+          <button class="role-choice role-choice-both" type="button" data-role-choice="both">
+            <span class="role-choice-icon"><i data-lucide="repeat-2"></i></span>
+            <span><strong>I want to do both</strong><small>Hire when you need help and sell your own services.</small></span>
+            <i data-lucide="arrow-up-right"></i>
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="market-dialog onboarding-dialog" id="onboardingDialog" aria-labelledby="onboardingTitle">
+      <form method="dialog" id="onboardingForm">
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow" id="onboardingEyebrow">Build your workspace</p>
+            <h2 id="onboardingTitle">A few details, then you are ready.</h2>
+          </div>
+          <button class="circle-button" type="button" formnovalidate data-close-dialog aria-label="Close onboarding" title="Close">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="onboarding-stepper" id="onboardingStepper" aria-label="Onboarding progress"></div>
+        <div id="onboardingBody"></div>
+        <div class="onboarding-actions" id="onboardingActions"></div>
+      </form>
+    </dialog>
+
+    <dialog class="market-dialog" id="orderDialog">
+      <form method="dialog" id="orderForm">
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow">Protected checkout</p>
+            <h2 id="orderTitle">Start order</h2>
+          </div>
+          <button class="circle-button" type="button" formnovalidate data-close-dialog aria-label="Close" title="Close">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <p class="dialog-copy" id="orderPrice">Funds are held by the platform until delivery is approved.</p>
+        <label>
+          <span>Project requirements</span>
+          <textarea name="requirements" required minlength="20" maxlength="5000" placeholder="Tell the freelancer what you need, files they should expect, and acceptance criteria."></textarea>
+        </label>
+        <button class="join-button wide" type="submit" value="default">
+          <span>Continue to secure payment</span>
+          <i data-lucide="lock"></i>
+        </button>
+      </form>
+    </dialog>
+
+    <dialog class="market-dialog" id="paymentDialog">
+      <form method="dialog" id="paymentForm">
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow">Secure Checkout</p>
+            <h2 id="paymentTitle">Processing Payment</h2>
+          </div>
+          <button class="circle-button" type="button" formnovalidate data-close-dialog aria-label="Cancel payment" title="Cancel">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="payment-gateway-sim">
+          <div class="payment-amount-display">
+            <span>Amount to pay</span>
+            <strong id="paymentGatewayAmount">₹0</strong>
+          </div>
+          <div class="payment-loader hidden" id="paymentLoader">
+            <i data-lucide="loader-2" class="spin"></i>
+            <p>Processing payment securely...</p>
+          </div>
+          <div class="payment-methods" id="paymentMethods">
+            <button class="payment-method-btn" type="button" data-method="card">
+              <i data-lucide="credit-card"></i> Pay via Card
+            </button>
+            <button class="payment-method-btn" type="button" data-method="upi">
+              <i data-lucide="smartphone"></i> Pay via UPI
+            </button>
+          </div>
+          <div class="payment-card-form hidden" id="paymentCardForm">
+            <input type="text" placeholder="Card Number" value="4242 4242 4242 4242" readonly />
+            <div class="payment-card-row">
+              <input type="text" placeholder="MM/YY" value="12/26" readonly />
+              <input type="text" placeholder="CVC" value="123" readonly />
+            </div>
+            <button class="join-button wide" type="button" id="confirmPaymentBtn">Confirm Payment</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- ── Escrow Security Vaults Modal ── -->
+    <dialog class="auth-dialog futuristic-modal" id="escrowVaultsModal">
+      <div class="futuristic-modal-card">
+        <div class="futuristic-modal-header">
+          <div class="header-title">
+            <span class="futuristic-badge badge-cyan"><i data-lucide="shield-check"></i> Escrow Protection</span>
+            <h2>Active Escrow Security Vaults</h2>
+          </div>
+          <button class="circle-button" type="button" id="closeEscrowModal" aria-label="Close modal">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <div class="futuristic-modal-body">
+          <div class="escrow-vault-overview">
+            <div class="escrow-stat-box">
+              <span>Total Protected Funds</span>
+              <strong id="escrowModalProtected">₹0</strong>
+            </div>
+            <div class="escrow-stat-box">
+              <span>Security Index</span>
+              <strong style="color:#10b981;"><i data-lucide="shield"></i> 100% Guaranteed</strong>
+            </div>
+          </div>
+
+          <div class="escrow-features-list">
+            <div class="escrow-feature-item">
+              <div class="feat-icon"><i data-lucide="lock"></i></div>
+              <div>
+                <strong>Zero-Risk Milestone Vaults</strong>
+                <p>Client funds are locked securely when an order starts and released only after final work is verified and approved.</p>
+              </div>
+            </div>
+            <div class="escrow-feature-item">
+              <div class="feat-icon"><i data-lucide="scale"></i></div>
+              <div>
+                <strong>Fair Dispute Resolution</strong>
+                <p>If any milestone requirements are unmet, our automated arbitration panel guarantees transparent refund protection.</p>
+              </div>
+            </div>
+            <div class="escrow-feature-item">
+              <div class="feat-icon"><i data-lucide="zap"></i></div>
+              <div>
+                <strong>Instant Payouts</strong>
+                <p>Approved earnings transfer directly to your wallet balance within seconds of buyer sign-off.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="floating-wallet hidden" id="floatingWallet">
+      <button class="floating-wallet-toggle" id="floatingWalletToggle" aria-label="Toggle wallet menu">
+        <i data-lucide="wallet"></i>
+      </button>
+      <div class="floating-wallet-menu">
+        <div class="floating-wallet-header">
+          <span>Balance</span>
+          <strong id="floatingWalletBalance">₹0</strong>
+        </div>
+        <div class="floating-wallet-actions">
+          <button type="button" id="floatingWalletBtn"><i data-lucide="plus-circle"></i> Add Funds</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-tooltip hidden" id="chartTooltip"></div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  
+    <!-- ── Integrated 3D Secure Bank OTP Verification Modal ── -->
+    <dialog class="auth-dialog futuristic-modal" id="bankOtpModal">
+      <div class="futuristic-modal-card otp-modal-card">
+        <div class="futuristic-modal-header">
+          <div class="header-title">
+            <span class="futuristic-badge"><i data-lucide="shield-check"></i> 3D SECURE VERIFICATION</span>
+            <h2>Issuer Bank Authorization</h2>
+          </div>
+          <button class="circle-button" type="button" id="closeOtpModal" aria-label="Close OTP modal">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <div class="futuristic-modal-body">
+          <div class="otp-banner-box">
+            <i data-lucide="lock" class="otp-lock-icon"></i>
+            <div>
+              <strong>Verify Escrow Payment</strong>
+              <p>An OTP code has been sent to your registered mobile number ending in <strong>•••• 8912</strong> for <strong id="otpModalAmount">₹0.00</strong>.</p>
+            </div>
+          </div>
+
+          <div class="otp-input-section">
+            <label class="control-label">Enter 6-Digit OTP Code</label>
+            <div class="otp-field-wrapper">
+              <input type="text" id="bankOtpInput" placeholder="123456" maxlength="6" autocomplete="one-time-code" value="123456" />
+            </div>
+            <small class="otp-demo-hint"><i data-lucide="sparkles"></i> Verification Code: <strong>123456</strong></small>
+          </div>
+
+          <div class="otp-action-row">
+            <button class="futuristic-submit-btn" type="button" id="submitBankOtpBtn">
+              <i data-lucide="check-circle-2"></i>
+              <span>Authorize & Deposit Funds</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+  </body>
+</html>

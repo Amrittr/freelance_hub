@@ -1,0 +1,8 @@
+{
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.exclude": { "**/node_modules": true },
+  "search.exclude": { "**/node_modules": true, "**/package-lock.json": true },
+  "javascript.preferences.importModuleSpecifierEnding": "js"
+}
