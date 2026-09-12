@@ -1,41 +1,13 @@
 {
   "version": 2,
-  "buildCommand": "npm install",
-  "outputDirectory": "public",
   "functions": {
     "api/index.js": {
       "maxDuration": 30,
       "memory": 512
     }
   },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/app.js",
-      "dest": "/public/app.js"
-    },
-    {
-      "src": "/styles.css",
-      "dest": "/public/styles.css"
-    },
-    {
-      "src": "/firebase-config.js",
-      "dest": "/public/firebase-config.js"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/public/assets/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|svg|ico|webp|jpg|jpeg|gif|woff|woff2|ttf))",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/index.html"
-    }
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index.js" },
+    { "source": "/((?!api/).*)", "destination": "/public/$1" }
   ]
 }
