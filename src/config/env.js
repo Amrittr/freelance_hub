@@ -2,16 +2,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const requiredInProduction = [
-  "JWT_SECRET",
-];
-
 const isProduction = process.env.NODE_ENV === "production";
-const missing = requiredInProduction.filter((key) => !process.env[key]);
 
-if (isProduction && missing.length) {
-  throw new Error(`Missing required production environment variables: ${missing.join(", ")}`);
-}
 
 export const env = {
   nodeEnv: process.env.NODE_ENV || "development",

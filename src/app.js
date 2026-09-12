@@ -69,7 +69,7 @@ export function createApp() {
   );
   app.use(attachUser);
 
-  app.get("/api/health", (_req, res) => {
+  app.get(["/api/health", "/health"], (_req, res) => {
     res.json({
       ok: true,
       service: "FreelanceHub",
@@ -78,17 +78,21 @@ export function createApp() {
     });
   });
 
-  app.use("/api/auth", authRouter);
-  app.use("/api/services", servicesRouter);
-  app.use("/api/orders", ordersRouter);
-  app.use("/api/onboarding", onboardingRouter);
-  app.use("/api/payments", paymentsRouter);
-  app.use("/api/dashboard", dashboardRouter);
+  app.use(["/api/auth", "/auth"], authRouter);
+  app.use(["/api/services", "/services"], servicesRouter);
+  app.use(["/api/orders", "/orders"], ordersRouter);
+  app.use(["/api/onboarding", "/onboarding"], onboardingRouter);
+  app.use(["/api/payments", "/payments"], paymentsRouter);
+  app.use(["/api/dashboard", "/dashboard"], dashboardRouter);
 
   app.use(express.static(publicDir, { maxAge: env.isProduction ? "1d" : 0 }));
-  app.use("/api", notFound);
+  app.use(["/api", "/api/*"], notFound);
   app.get("*", (_req, res) => {
-    res.sendFile(path.join(publicDir, "index.html"));
+    res.sendFile(path.join(publicDir, "index.html"), (err) => {
+      if (err) {
+        res.status(200).send("OK");
+      }
+    });
   });
   app.use(errorHandler);
 
