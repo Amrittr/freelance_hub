@@ -52,7 +52,12 @@ npm run seed
 ```
 *Demo user password:* `FreelanceHub123!`
 
-### 4. Run Development Server
+### 4. (Optional) Syntax-Check the Server
+```bash
+npm run check
+```
+
+### 5. Run Development Server
 ```bash
 npm run dev
 ```
